@@ -1,0 +1,179 @@
+<odoo>
+    <!-- Tree (List) View -->
+    <record id="property_view_tree" model="ir.ui.view">
+        <field name="name">property tree</field>
+        <field name="model">property</field>
+        <field name="arch" type="xml">
+            <tree multi_edit="1" create="1" edit="1" delete="1" class="header_custom" decoration-danger="1==1">
+                <field name="ref"/>
+                <field name="name"/>
+                <field name="owner_id"/>
+                <field name="owner_address"/>
+                <field name="owner_phone"/>
+                <field name="data_availability"/>
+                <field name="selling_price"/>
+                <field name="garden"/>
+                <field name="garden_area"/>
+                <field name="garden_orientation"/>
+                <field name="accepted_price"/>
+                <field name="diff"/>
+                <field name="garage"/>
+                <field name="living_area"/>
+                <field name="state"/>
+                <field name="bedrooms"/>
+                <field name="tag_ids"/>
+                <field name="is_late" invisible="1"/>
+                <field name="expected_selling_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="property_view_form" model="ir.ui.view">
+        <field name="name">Property Form Testing</field>
+        <field name="model">property</field>
+        <field name="arch" type="xml">
+            <form>
+                <!-- الـ header تم نقله هنا (خارج الـ sheet مباشرة) لحل مشكلة Owl Lifecycle -->
+                <header>
+                    <button name="action_print_excel" type="object" string="Print Property Report xlsx" class="btn-primary"/>
+
+                    <button name="action_draft" type="object" class="btn-primary" string="Set To Draft"
+                            invisible="state == 'draft'"/>
+                    <button name="action_pending" type="object" class="btn-secondary" string="Set To Pending"
+                            invisible="state != 'draft'"/>
+                    <button name="action_sold" type="object" class="btn-success" string="Set To Sold"
+                            invisible="state != 'pending'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,sold,closed"
+                           options="{'clickable': 0}"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <label for="ref"/>
+                        <h1>
+                            <field name="ref"/>
+                        </h1>
+                        <label for="name"/>
+                        <h2>
+                            <field name="name" readonly="state == 'closed'"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="General info">
+                            <field name="owner_address"/>
+                            <field name="owner_phone"/>
+                            <field name="data_availability"/>
+                            <field name="owner_id"/>
+                            <field name="state"/>
+                            <field name="selling_price"/>
+                            <field name="diff"/>
+                            <field name="garden"/>
+                            <field name="post_code"/>
+                            <field name="maloka"/>
+                        </group>
+                        <group string="Additional info">
+                            <field name="garage"/>
+                            <field name="living_area"/>
+                            <field name="bedrooms"/>
+                            <field name="expected_selling_date"/>
+                            <field name="is_late"/>
+                        </group>
+                        <group string="">
+                            <field name="garden_area"/>
+                            <field name="garden_orientation"/>
+                            <field name="accepted_price"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Bedrooms">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="description"/>
+                                    <field name="area"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="property_action" model="ir.actions.act_window">
+        <field name="name">property action</field>
+        <field name="res_model">property</field>
+    </record>
+
+    <!-- Server Action -->
+    <record id="property_closed_action" model="ir.actions.server">
+        <field name="name">Close Property</field>
+        <field name="model_id" ref="model_property"/>
+        <field name="binding_model_id" ref="model_property"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.action_close()
+        </field>
+    </record>
+
+    <!-- Excel Report Action -->
+<record id="property_excel_report_action"
+        model="ir.actions.server">
+
+    <field name="name">Print Property Excel Report</field>
+
+    <field name="model_id" ref="model_property"/>
+
+    <field name="binding_model_id" ref="model_property"/>
+
+    <field name="binding_view_types">list</field>
+
+    <field name="state">code</field>
+
+    <field name="code">
+action = records.action_print_excel()
+    </field>
+
+</record>
+
+    <!-- Scheduled Action (Cron) -->
+    <record id="check_selling_date_cron" model="ir.cron">
+        <field name="name">Property: check selling date</field>
+        <field name="model_id" ref="model_property"/>
+        <field name="state">code</field>
+        <field name="code">model.check_selling_date()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem
+            id="property_menu_item"
+            name="Properties"
+            parent="properties_menu"
+            action="property_action"
+    />
+
+    <record id="list_view_action" model="ir.actions.client">
+        <field name="name">Properties List View</field>
+        <!-- (app_one.action_list_view )from listview js-->
+        <field name="tag">app_one.action_list_view</field>
+    </record>
+
+        <menuitem
+            id="property_list_view_menu_item"
+            name="Properties OWL"
+            parent="properties_menu"
+            action="list_view_action"
+    />
+</odoo>
