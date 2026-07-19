@@ -29,10 +29,6 @@ A custom Odoo module developed for managing real estate operations, including pr
 - Data Files
 - Business Logic
 
-## Screenshots
-
-Add screenshots of the application here.
-
 ## Author
 
 Malak Ammar
