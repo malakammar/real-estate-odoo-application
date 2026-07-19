@@ -20,6 +20,10 @@ A custom Odoo module developed for managing real estate operations, including pr
 - PostgreSQL
 - XML
 - Odoo ORM
+- Kanban Views
+- Reports
+- QWeb
+- OWL
 
 ## Project Structure
 
